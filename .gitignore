@@ -1,0 +1,15 @@
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+.features-gen/
+.env
+
+# IDE config
+.vscode/
+
+# Mac OS
+.DS_Store
