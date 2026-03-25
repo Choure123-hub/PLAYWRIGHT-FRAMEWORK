@@ -40,6 +40,11 @@ export default defineConfig({
     /* Make the bot look slightly more like a real user to bypass simple checks */
     userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
   },
+    /* Timeout settings optimized for CI environments */
+  timeout: process.env.CI ? 120000 : 30000, // 120s in CI, 30s locally
+  expect: {
+    timeout: process.env.CI ? 60000 : 5000, // 60s assertions in CI, 5s locally
+  },
   
 
   /* Configure projects for major browsers */
