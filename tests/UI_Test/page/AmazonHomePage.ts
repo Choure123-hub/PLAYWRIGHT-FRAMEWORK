@@ -37,20 +37,8 @@ export class AmazonHomePage {
   }
 
   async logout() {
-    // Scroll to the top of the page to ensure the navigation bar is fully in view
-    await this.page.evaluate(() => window.scrollTo(0, 0));
-    
-    await this.signInLink.hover();
-    
-    // Explicitly wait for the sign-out link to become visible (using first() to prevent strict mode errors)
-    const signoutBtn = this.signOutLink.first();
-    await signoutBtn.waitFor({ state: 'visible', timeout: 10000 });
-    // Force click bypasses any hovering animation overlays that might block standard clicks
-    await signoutBtn.click({ force: true });
-    
-    // Wait for the element to be attached to the DOM (it usually already is)
-    await signoutBtn.waitFor({ state: 'attached', timeout: 10000 });
-    // Use evaluate to perform a native DOM click, bypassing Playwright's strict visibility checks.
-    await signoutBtn.evaluate((el: HTMLElement) => el.click());
+    // Trying to hover and click the logout button is highly flaky on Amazon due to bot protection.
+    // The most reliable way to log out in automation is to hit the logout endpoint directly.
+    await this.page.goto('/gp/flex/sign-out.html');
   }
 }
