@@ -6,8 +6,9 @@ export class AmazonSearchResultsPage {
 
   constructor(page: Page) {
     this.page = page;
-    // Amazon frequently changes its DOM: sometimes the link contains the heading (a > h2), sometimes the heading contains the link (h2 > a).
-    this.firstProductLink = page.locator('a:has(h2), h2 a').first();
+    // Target the first actual search result link, strictly ignoring sponsored brand banners
+    // Amazon's DOM structure can vary: sometimes <h2> contains <a>, sometimes <a> contains <h2>.
+    this.firstProductLink = page.locator('[data-component-type="s-search-result"] a:has(h2), [data-component-type="s-search-result"] h2 a').first();
   }
 
   async verifySearchResults(keyword: string) {

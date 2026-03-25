@@ -10,3 +10,7 @@ When('I click on the first search result', async ({ searchResultsPage }) => {
 Then('I should see the product details page', async ({ productDetailsPage }) => {
   await productDetailsPage.verifyPageLoaded();
 });
+
+When('I add the product to the cart', async ({ productDetailsPage }) => {
+  await productDetailsPage.clickAddToCart();
+});
