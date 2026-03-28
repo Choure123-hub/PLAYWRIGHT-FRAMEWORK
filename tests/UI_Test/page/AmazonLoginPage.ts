@@ -21,7 +21,7 @@ export class AmazonLoginPage {
     if (await this.page.locator('form[action="/errors/validateCaptcha"], h1:has-text("Solve this puzzle")').isVisible({ timeout: 5000 })) {
       console.error('\n🚨 Amazon blocked navigation to the login screen with an early CAPTCHA! 🚨\n');
       console.log('Pausing test. Please solve the CAPTCHA in the open browser window, then click "Resume" in the Playwright Inspector.');
-      await this.page.pause();
+      throw new Error('Amazon blocked navigation to the login screen with an early CAPTCHA.');
     }
 
     // Explicitly wait for the email input to be visible and click it to ensure focus
@@ -38,16 +38,23 @@ export class AmazonLoginPage {
     if (await captchaOrOtp.isVisible({ timeout: 5000 }).catch(() => false)) {
       console.error('\n🚨 Amazon anti-bot security (CAPTCHA/OTP) detected! Automated login is blocked. 🚨\n');
       console.log('Pausing test. Please solve the challenge or enter the OTP in the browser window, then click "Resume".');
-      await this.page.pause();
+      throw new Error('Amazon anti-bot security (CAPTCHA/OTP) detected during login.');
     }
 
     // Wait for the password input to appear after clicking continue
     await this.passwordInput.waitFor({ state: 'visible', timeout: 10000 });
     await this.passwordInput.fill(password);
     await this.signInSubmit.click();
+    
+    // Check if Amazon threw a CAPTCHA or OTP challenge AFTER password submission
+    if (await captchaOrOtp.isVisible({ timeout: 5000 }).catch(() => false)) {
+      console.error('\n🚨 Amazon anti-bot security (CAPTCHA/OTP) detected after password! 🚨\n');
+      throw new Error('Amazon anti-bot security (CAPTCHA/OTP) detected after password submission.');
+    }
   }
 
   async verifyAccountPage() {
-    await expect(this.page.locator('#nav-link-accountList-nav-line-1')).not.toHaveText('Hello, sign in', { timeout: 15000 });
+    // Reduced timeout to prevent exceeding global test timeout, failing gracefully instead
+    await expect(this.page.locator('#nav-link-accountList-nav-line-1')).not.toHaveText('Hello, sign in', { timeout: 5000 });
   }
 }

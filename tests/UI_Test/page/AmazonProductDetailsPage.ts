@@ -2,29 +2,34 @@ import { expect, type Locator, type Page } from '@playwright/test';
 
 export class AmazonProductDetailsPage {
   readonly page: Page;
+  readonly productTitle: Locator;
   readonly addToCartButton: Locator;
-  readonly buyNowButton: Locator;
+  readonly quantityDropdown: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    // Broaden the locator to catch different Add to Cart input elements
-    this.addToCartButton = page.locator('#add-to-cart-button, input[name="submit.add-to-cart"]');
-    this.buyNowButton = page.locator('#buy-now-button');
+    this.productTitle = page.locator('#productTitle').first();
+    // The add to cart button can have different IDs, let's make it robust
+    this.addToCartButton = page.locator('#add-to-cart-button, #buy-now-button');
+    this.quantityDropdown = page.locator('#quantity').or(page.getByRole('combobox', { name: /Quantity/i }));
   }
 
-  async verifyPageLoaded() {
-    // Use toBeAttached() instead of toBeVisible() because Amazon visually hides the <input> element via CSS
-    await expect(this.addToCartButton.or(this.buyNowButton).first()).toBeAttached({ timeout: 15000 });
+  async verifyProductDetailsPage(keyword: string) {
+    await expect(this.productTitle).toBeVisible({ timeout: 20000 });
+    await expect(this.productTitle).toContainText(keyword, { ignoreCase: true });
   }
 
-  async clickAddToCart() {
-    // Amazon's complex UI often has transparent overlays or scripts that intercept simulated mouse clicks.
-    // Executing a native DOM click via JavaScript bypasses all UI rendering checks.
-    const cartBtn = this.addToCartButton.first();
-    await cartBtn.waitFor({ state: 'attached', timeout: 10000 });
-    await cartBtn.evaluate((el: HTMLElement) => el.click());
+  async addToCart() {
+    await this.addToCartButton.first().click();
+    // Wait for the cart count to update to ensure the request completes before navigating away
+    await expect(this.page.locator('#nav-cart-count')).not.toHaveText('0', { timeout: 10000 });
+  }
 
-    // Wait a brief moment for Amazon's sliding cart panel or redirect to process
-    await this.page.waitForTimeout(3000);
+  async selectQuantityAndAddToCart(quantity: string) {
+    if (await this.quantityDropdown.first().isVisible()) {
+      await this.quantityDropdown.first().selectOption(quantity);
+    }
+    await this.addToCartButton.first().click();
+    await expect(this.page.locator('#nav-cart-count')).not.toHaveText('0', { timeout: 10000 });
   }
 }
