@@ -8,7 +8,6 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 .features-gen/
-.env
 
 # IDE config
 .vscode/
