@@ -5,6 +5,9 @@ export class AmazonSearchResultsPage {
   readonly firstProductLink: Locator;
   readonly noResultsMessage: Locator;
   readonly fourStarsAndUpFilter: Locator;
+  readonly minPriceInput: Locator;
+  readonly maxPriceInput: Locator;
+  readonly priceGoButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -16,6 +19,10 @@ export class AmazonSearchResultsPage {
     this.noResultsMessage = page.getByText(/No results for/i).first();
     // Filter for 4 stars and up
     this.fourStarsAndUpFilter = page.locator('section[aria-label*="4 Stars & Up"] i, i.a-star-medium-4').first();
+    // Price range locators
+    this.minPriceInput = page.locator('input#low-price');
+    this.maxPriceInput = page.locator('input#high-price');
+    this.priceGoButton = page.locator('.s-price-go-button-submit input, input.a-button-input[aria-labelledby*="a-autoid-"], form[method="get"] input[type="submit"]');
   }
 
   async verifySearchResults(keyword: string) {
@@ -56,5 +63,20 @@ export class AmazonSearchResultsPage {
   async filterByFourStarsAndUp() {
     await this.fourStarsAndUpFilter.click();
     await this.page.waitForLoadState('domcontentloaded');
+  }
+
+  async filterByPrice(minPrice: string, maxPrice: string) {
+    // Playwright automatically scrolls elements into view.
+    // We use `:visible` to ensure we don't accidentally target hidden mobile layouts in the DOM.
+    const minInput = this.minPriceInput.locator(':visible').first();
+    const maxInput = this.maxPriceInput.locator(':visible').first();
+    const goButton = this.priceGoButton.locator(':visible').first();
+
+    await minInput.fill(minPrice);
+    await maxInput.fill(maxPrice);
+    await goButton.click();
+
+    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.waitForTimeout(2000); // Give Amazon's AJAX time to update the result list
   }
 }

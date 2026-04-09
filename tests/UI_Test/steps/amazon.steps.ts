@@ -1,6 +1,10 @@
 import { createBdd } from 'playwright-bdd';
-import { test } from './fixtures';
+import { test } from '../fixture/fixtures';
+import testData from '../data/users.json';
 
+
+// Declare process to bypass TypeScript missing Node types without needing an import
+declare const process: any;
 
 const { Given, When, Then } = createBdd(test);
 
@@ -49,4 +53,25 @@ Then('I should be redirected to the Amazon cart page', async ({ cartPage }) => {
 
 Then('I should see the Amazon empty cart message', async ({ cartPage }) => {
   await cartPage.verifyEmptyCart();
+});
+
+When('I search for the valid product from test data', async ({ homePage }) => {
+  await homePage.searchForItem(testData.searchData.validProduct);
+});
+
+Then('I should see search results for the valid product', async ({ searchResultsPage }) => {
+  await searchResultsPage.verifySearchResults(testData.searchData.validProduct);
+});
+
+When('I login using standard user credentials from test data', async ({ homePage, loginPage }) => {
+  await homePage.clickSignIn();
+  await loginPage.login(testData.standardUser.email, testData.standardUser.password);
+});
+
+When('I search for the invalid product from test data', async ({ homePage }) => {
+  await homePage.searchForItem(testData.searchData.invalidProduct);
+});
+
+Then('I should see a no results message for the invalid product', async ({ searchResultsPage }) => {
+  await searchResultsPage.verifyNoResultsMessage(testData.searchData.invalidProduct);
 });

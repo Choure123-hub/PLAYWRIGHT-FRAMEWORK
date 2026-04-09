@@ -9,14 +9,17 @@ export class AmazonCartPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.emptyCartMessage = page.locator('h2:has-text("Your Amazon Cart is empty")').or(page.locator('.sc-your-amazon-cart-is-empty'));
+    // Use a highly robust regex to catch variations like "Your Amazon Cart is empty" or "Your Shopping Cart is empty"
+    this.emptyCartMessage = page.getByText(/Cart is empty/i)
+      .or(page.locator('.sc-your-amazon-cart-is-empty'));
     // Use robust fallbacks for dynamic Amazon DOMs
     this.activeCartItems = page.getByRole('list', { name: /Shopping Cart/i }).getByRole('listitem')
       .or(page.locator('#sc-active-cart .sc-list-item'))
       .or(page.locator('[data-name="Active Items"] .sc-list-item-content'));
     this.cartSubtotal = page.locator('#sc-subtotal-label-active-cart').or(page.getByText(/Subtotal \(/i));
     // Scope the delete button to the active cart to avoid clicking delete on "Saved for later" items.
-    this.deleteButton = this.activeCartItems.first().getByRole('button', { name: /Delete/i });
+    // Use specific attributes to avoid strict mode violations with the quantity stepper decrement button
+    this.deleteButton = this.activeCartItems.first().locator('[data-action="delete-active"], [data-feature-id="item-delete-button"]').first();
   }
 
   async verifyRedirected() {
@@ -24,7 +27,8 @@ export class AmazonCartPage {
   }
 
   async verifyEmptyCart() {
-    await expect(this.emptyCartMessage.first()).toBeVisible();
+    // The most reliable indicator of an empty cart on Amazon is the global cart count badge
+    await expect(this.page.locator('#nav-cart-count')).toHaveText('0', { timeout: 10000 });
   }
 
   async verifyProductAdded() {
@@ -38,9 +42,22 @@ export class AmazonCartPage {
   }
 
   async removeProduct() {
-    await this.deleteButton.click();
-    // The click triggers a dynamic update. Wait for the empty cart message to appear,
-    // which confirms the product has been removed.
-    await expect(this.emptyCartMessage.first()).toBeVisible({ timeout: 10000 });
+    // Handle test pollution: Previous tests might have left multiple items in the cart.
+    // We click delete on the first item and wait for it to disappear, repeating until the cart is empty.
+    let deleteBtnCount = await this.deleteButton.count();
+    while (deleteBtnCount > 0) {
+      await this.deleteButton.first().click();
+      
+      // Wait for the cart to process the deletion by checking that the total number of delete buttons decreases
+      const currentCount = deleteBtnCount;
+      await expect(async () => {
+        expect(await this.deleteButton.count()).toBeLessThan(currentCount);
+      }).toPass({ timeout: 5000 });
+      
+      deleteBtnCount = await this.deleteButton.count();
+    }
+    
+    // Check the global cart badge instead of the main page text, as it updates instantly via AJAX and is not subject to A/B testing
+    await expect(this.page.locator('#nav-cart-count')).toHaveText('0', { timeout: 10000 });
   }
 }

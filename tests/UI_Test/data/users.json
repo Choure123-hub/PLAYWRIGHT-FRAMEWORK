@@ -1,0 +1,11 @@
+{
+  "standardUser": {
+    "email": "chourebs@gmail.com",
+    "password": "Choure@1234"
+  },
+  "searchData": {
+    "validProduct": "Laptop",
+    "invalidProduct": "a_very_long_and_unlikely_product_name_xyz"
+  }
+}
+

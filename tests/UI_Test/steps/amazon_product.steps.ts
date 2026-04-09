@@ -1,5 +1,5 @@
 import { createBdd } from 'playwright-bdd';
-import { test } from './fixtures';
+import { test } from '../fixture/fixtures';
 
 const { When, Then } = createBdd(test);
 
@@ -35,4 +35,20 @@ When('I remove the product from the cart', async ({ cartPage }) => {
 
 Then('I should see that the cart is empty', async ({ cartPage }) => {
   await cartPage.verifyEmptyCart();
+});
+
+When('I filter the search results by 4 stars and up', async ({ searchResultsPage }) => {
+  await searchResultsPage.filterByFourStarsAndUp();
+});
+
+When('I select quantity {string} and add the product to the cart', async ({ productDetailsPage }, quantity: string) => {
+  await productDetailsPage.selectQuantityAndAddToCart(quantity);
+});
+
+When('I filter the price range from {string} to {string}', async ({ searchResultsPage }, minPrice: string, maxPrice: string) => {
+  await searchResultsPage.filterByPrice(minPrice, maxPrice);
+});
+
+Then('I intentionally fail the test', async () => {
+  throw new Error('This is an intentional failure to test reports and screenshot captures.');
 });
