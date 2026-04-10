@@ -1,6 +1,36 @@
 @Additional
 Feature: Amazon Additional Scenarios
 
+  @TC-21
+  Scenario: Complex user journey: Login, search, add to cart, remove, and logout
+    Given I navigate to the Amazon homepage
+    When I login with valid credentials
+    Then I should be logged in successfully
+    When I search for "Smart Watch" on Amazon
+    Then I should see Amazon search results for "Smart Watch"
+    When I click on the first search result
+    Then I should see the "Smart Watch" product details page
+    When I add the product to the cart
+    Then I should see the product in the cart
+    When I remove the product from the cart
+    Then I should see that the cart is empty
+    When I logout of the account
+    Then I should be redirected to the sign-in page
+
+  @TC-20
+  Scenario: Complex user journey: Search, apply multiple filters, and add to cart
+    Given I navigate to the Amazon homepage
+    When I search for "Wireless Keyboard" on Amazon
+    Then I should see Amazon search results for "Wireless Keyboard"
+    When I filter the search results by 4 stars and up
+    Then I should see Amazon search results for "Wireless Keyboard"
+    When I filter the price range from "1000" to "3000"
+    Then I should see Amazon search results for "Wireless Keyboard"
+    When I click on the first search result
+    Then I should see the "Wireless Keyboard" product details page
+    When I add the product to the cart
+    Then I should see the product in the cart
+
   @TC-05
   Scenario: Search for a product and apply 4 Stars & Up filter
     Given I navigate to the Amazon homepage
@@ -16,6 +46,12 @@ Feature: Amazon Additional Scenarios
     And I click on the first search result
     And I select quantity "2" and add the product to the cart
     Then I should see the product in the cart
+
+  @TC-19
+  Scenario: Search for a non-existent product and verify no results message
+    Given I navigate to the Amazon homepage
+    When I search for a product that does not exist
+    Then I should see a "no results" message
 
   @TC-18
   Scenario: Intentional failure to verify reporting and screenshot capture

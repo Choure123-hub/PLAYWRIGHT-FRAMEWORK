@@ -1,5 +1,6 @@
 import { createBdd } from 'playwright-bdd';
 import { test } from '../fixture/fixtures';
+import { expect } from '@playwright/test';
 
 const { When, Then } = createBdd(test);
 
@@ -51,4 +52,17 @@ When('I filter the price range from {string} to {string}', async ({ searchResult
 
 Then('I intentionally fail the test', async () => {
   throw new Error('This is an intentional failure to test reports and screenshot captures.');
+});
+
+Then('I should be logged in successfully', async ({ loginPage }) => {
+  await loginPage.verifyAccountPage();
+});
+
+When('I logout of the account', async ({ page }) => {
+  await page.locator('#nav-link-accountList').hover();
+  await page.locator('#nav-item-signout').click();
+});
+
+Then('I should be redirected to the sign-in page', async ({ page }) => {
+  await expect(page.locator('h1').filter({ hasText: /Sign in/i })).toBeVisible({ timeout: 10000 });
 });

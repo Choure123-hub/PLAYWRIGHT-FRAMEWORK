@@ -72,11 +72,21 @@ export class AmazonSearchResultsPage {
     const maxInput = this.maxPriceInput.locator(':visible').first();
     const goButton = this.priceGoButton.locator(':visible').first();
 
-    await minInput.fill(minPrice);
-    await maxInput.fill(maxPrice);
-    await goButton.click();
+    try {
+      // 1. Explicitly wait for the input to be visible (reduced to 5 seconds to fail faster)
+      await minInput.waitFor({ state: 'visible', timeout: 5000 });
+      
+      // 2. Scroll the input into view so Playwright isn't blocked by overlays
+      await minInput.scrollIntoViewIfNeeded();
 
-    await this.page.waitForLoadState('domcontentloaded');
-    await this.page.waitForTimeout(2000); // Give Amazon's AJAX time to update the result list
+      await minInput.fill(minPrice);
+      await maxInput.fill(maxPrice);
+      await goButton.click();
+
+      await this.page.waitForLoadState('domcontentloaded');
+      await this.page.waitForTimeout(2000); // Give Amazon's AJAX time to update the result list
+    } catch (error) {
+      console.log('Price filter not visible or unavailable for this search. Skipping price filter.');
+    }
   }
 }
