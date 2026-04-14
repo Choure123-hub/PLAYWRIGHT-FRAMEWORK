@@ -85,7 +85,7 @@ export class AmazonSearchResultsPage {
 
       await this.page.waitForLoadState('domcontentloaded');
       await this.page.waitForTimeout(2000); // Give Amazon's AJAX time to update the result list
-    } catch (error) {
+    } catch {
       console.log('Price filter not visible or unavailable for this search. Skipping price filter.');
     }
   }

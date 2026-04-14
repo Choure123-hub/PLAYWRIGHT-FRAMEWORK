@@ -1,6 +1,5 @@
 import { createBdd } from 'playwright-bdd';
 import { test } from '../fixture/fixtures';
-
 const { When, Then } = createBdd(test);
 
 When('I filter the search results by 4 Stars and Up', async ({ searchResultsPage }) => {

@@ -1,8 +1,8 @@
 @amazon-extra
 Feature: Amazon Extra Features - Filtering and Navigation
 
-  Background:
-    Given I navigate to the Amazon homepage
+  # Background:
+  #   Given I navigate to the Amazon homepage
 
 @TC-06
   Scenario: Filter search results by Customer Review

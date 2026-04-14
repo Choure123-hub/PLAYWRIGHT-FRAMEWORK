@@ -23,5 +23,5 @@ export const test = base.extend<Fixtures>({
   cartPage: async ({ page }, use) => await use(new AmazonCartPage(page)),
   productDetailsPage: async ({ page }, use) => await use(new AmazonProductDetailsPage(page)),
   // This creates a new, empty object for each scenario.
-   world: async ({ page }, use) => await use({} as World),
+  world: async ({}, use) => await use({} as World),
 });

@@ -3,9 +3,6 @@ import { test } from '../fixture/fixtures';
 import testData from '../data/users.json';
 
 
-// Declare process to bypass TypeScript missing Node types without needing an import
-declare const process: any;
-
 const { Given, When, Then } = createBdd(test);
 
 Given('I navigate to the Amazon homepage', async ({ homePage }) => {

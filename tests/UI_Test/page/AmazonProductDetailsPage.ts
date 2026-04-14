@@ -35,7 +35,7 @@ export class AmazonProductDetailsPage {
     try {
       await this.quantityDropdown.first().waitFor({ state: 'visible', timeout: 3000 });
       await this.quantityDropdown.first().selectOption(quantity);
-    } catch (error) {
+    } catch {
       console.log(`Quantity dropdown not visible or option '${quantity}' unavailable. Proceeding with default.`);
     }
     

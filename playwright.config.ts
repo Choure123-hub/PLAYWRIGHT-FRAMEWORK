@@ -7,14 +7,11 @@ import { defineBddConfig } from 'playwright-bdd';
  */
 import 'dotenv/config';
 
-// Declare process to bypass TypeScript missing Node types without needing an import
-declare const process: any;
-
 const testDir = defineBddConfig({
-  // features: 'tests/UI_Test/feature/**/*.feature',
-  // steps: ['tests/UI_Test/steps/**/*.ts', 'tests/UI_Test/fixture/**/*.ts'], // Array of globs to include both steps and fixtures
-  features: 'tests/**/feature/**/*.feature',
-  steps: ['tests/**/steps/**/*.ts', 'tests/**/fixture/**/*.ts'], // Array of globs to include both steps and fixtures
+  features: 'tests/UI_Test/feature/**/*.feature',
+  steps: ['tests/UI_Test/steps/**/*.ts', 'tests/UI_Test/fixture/**/*.ts'], // Array of globs to include both steps and fixtures
+  // features: 'tests/**/feature/**/*.feature',
+  // steps: ['tests/**/steps/**/*.ts', 'tests/**/fixture/**/*.ts'], // Array of globs to include both steps and fixtures
 });
 
 /**
